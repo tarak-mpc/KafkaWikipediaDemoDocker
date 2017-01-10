@@ -1,0 +1,63 @@
+{
+  "type": "record",
+  "name": "Message",
+  "namespace": "org.cmatta.kafka.connect.irc",
+  "fields": [
+    {
+      "name": "createdat",
+      "type": {
+        "type": "long",
+        "connect.doc": "When this message was received.",
+        "connect.version": 1,
+        "connect.name": "org.apache.kafka.connect.data.Timestamp"
+      }
+    },
+    {
+      "name": "channel",
+      "type": {
+        "type": "string",
+        "connect.doc": "The channel to which the message was sent."
+      }
+    },
+    {
+      "name": "sender",
+      "type": {
+        "type": "record",
+        "name": "User",
+        "fields": [
+          {
+            "name": "nick",
+            "type": {
+              "type": "string",
+              "connect.doc": "The nick of the person who sent the message."
+            }
+          },
+          {
+            "name": "login",
+            "type": {
+              "type": "string",
+              "connect.doc": "The login of the person who sent the message."
+            }
+          },
+          {
+            "name": "hostname",
+            "type": {
+              "type": "string",
+              "connect.doc": "The hostname of the person who sent the message."
+            }
+          }
+        ],
+        "connect.name": "org.cmatta.kafka.connect.irc.User"
+      }
+    },
+    {
+      "name": "message",
+      "type": {
+        "type": "string",
+        "connect.doc": "The actual message sent to the channel."
+      }
+    }
+  ],
+  "connect.doc": "Basic IRC message.",
+  "connect.name": "org.cmatta.kafka.connect.irc.Message"
+}

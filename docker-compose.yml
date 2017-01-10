@@ -1,0 +1,237 @@
+version: "2"
+
+volumes:
+  zookeeper:
+  kafka:
+
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    networks:
+     - dev
+    ports:
+      - "2181:2181"
+      - "2888"
+      - "3888"
+    volumes:
+      - zookeeper:/var/lib/zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+
+  kafka0:
+    container_name: kafka0 
+    image: confluentinc/cp-enterprise-kafka:latest
+    hostname: kafka0 
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+    ports:
+      - "9090:9090"
+    volumes:
+      - kafka:/var/lib/kafka
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_BROKER_RACK: 1
+      KAFKA_LOG_DIRS: "/var/lib/kafka/kafka0"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka0:9090"
+      KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka0:9090"
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 3
+      CONFLUENT_METRICS_REPORTER_PUBLISH_MS: 1000
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+
+  kafka1:
+    container_name: kafka1
+    image: confluentinc/cp-enterprise-kafka:latest
+    hostname: kafka1
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+    ports:
+      - "9091:9091"
+    volumes:
+      - kafka:/var/lib/kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: 1
+      KAFKA_LOG_DIRS: "/var/lib/kafka/kafka1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9091"
+      KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka0:9090"
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 3
+      CONFLUENT_METRICS_REPORTER_PUBLISH_MS: 1000
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+
+  kafka2:
+    container_name: kafka2
+    image: confluentinc/cp-enterprise-kafka:latest
+    hostname: kafka2
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka:/var/lib/kafka
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_BROKER_RACK: 1
+      KAFKA_LOG_DIRS: "/var/lib/kafka/kafka2"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka2:9092"
+      KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka0:9090"
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 3
+      CONFLUENT_METRICS_REPORTER_PUBLISH_MS: 1000
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+
+  schema-registry:
+    container_name: schema-registry
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+      - kafka0
+      - kafka1
+      - kafka2
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+
+  kafka-rest:
+    container_name: kafka-rest
+    image: confluentinc/cp-kafka-rest:latest
+    hostname: kafka-rest
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+      - kafka0
+      - kafka1
+      - kafka2
+      - schema-registry
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_REST_HOST_NAME: "kafka-rest"
+      KAFKA_REST_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+
+  connect:
+    container_name: connect
+    image: confluentinc/cp-kafka-connect:latest
+    restart: always
+    hostname: connect
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+      - kafka0
+      - kafka1
+      - kafka2
+      - schema-registry
+    volumes:
+      - ./kafka-connect-irc/target/kafka-connect-irc-1.0-SNAPSHOT-package/share/java/kafka-connect-irc:/usr/share/java/kafka-connect-irc
+      - ./kafka-connect-irc/target/kafka-connect-irc-1.0-SNAPSHOT-package/etc/kafka-connect-irc:/etc/kafka-connect-irc
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka0:9090,kafka1:9091,kafka2:9092"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "default"
+      CONNECT_CONFIG_STORAGE_TOPIC: "default.config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "default.offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "default.status"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_VALUE_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      CONNECT_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      
+  control-center:
+    container_name: control-center
+    image: confluentinc/cp-enterprise-control-center:latest
+    restart: always
+    hostname: control-center
+    networks:
+     - dev
+    depends_on:
+      - zookeeper
+      - kafka0
+      - kafka1
+      - kafka2
+      - schema-registry
+      - connect
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka0:9090,kafka1:9091,kafka2:9092"
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONTROL_CENTER_CONNECT_CLUSTER: "connect:8083"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 2
+      CONTROL_CENTER_STREAMS_CONSUMER_REQUEST_TIMEOUT_MS: "960032"
+      PORT: 9021
+      
+  elasticsearch:
+    container_name: elasticsearch
+    image: library/elasticsearch:latest
+    restart: always
+    hostname: elasticsearch
+    networks:
+     - dev
+    #command: elasticsearch -Des.network.host=0.0.0.0
+    depends_on:
+      - connect
+    ports:
+      - "9200:9200"
+    # - "9300:9300"
+      
+      
+  kibana:
+    container_name: kibana
+    image: library/kibana:latest
+    restart: always
+    hostname: kibana
+    networks:
+     - dev
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+
+networks:
+  dev:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv4: "true"
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.20.0.0/16
+        gateway: 172.20.0.1
