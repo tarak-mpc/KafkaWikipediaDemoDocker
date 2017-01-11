@@ -1,219 +1,97 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.eneco.trading</groupId>
+    <groupId>io.confluent.examples</groupId>
     <artifactId>kafka-connect-twitter</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <version>0.1</version>
+
     <name>kafka-connect-twitter</name>
-    <organization>
-        <name>Eneco</name>
-        <url>http://energytradeuk.eneco.nl</url>
-    </organization>
-    <url>http://energytradeuk.eneco.nl/</url>
-    <description>
-        A Kafka Connect Twitter source connector for copying data between Twitter and Kafka.
-    </description>
-
-    <scm>
-        <connection>scm:git:git@github.com/Eneco/kafka-connect-twitter.git</connection>
-        <url>https://github.com/Eneco/kafka-connect-twitter</url>
-        <developerConnection>scm:git:git@github.com/Eneco/kafka-connect-twitter.git
-        </developerConnection>
-    </scm>
-
-    <developers>
-        <developer>
-            <id>rollulus</id>
-            <name>Roel Reijerse</name>
-            <organization>Eneco</organization>
-        </developer>
-        <developer>
-            <id>andrewstevenson</id>
-            <name>Andrew Stevenson</name>
-            <organization>Datamountaineer</organization>
-        </developer>
-        <developer>
-            <id>GodlyLudu</id>
-            <name>Henry Cheung</name>
-            <organization>Eneco</organization>
-        </developer>
-        <developer>
-            <id>dudebowski</id>
-            <name>Adriaan Mutter</name>
-            <organization>Eneco</organization>
-        </developer>
-        <developer>
-            <id>Chrizje</id>
-            <name>Christian De Jong</name>
-            <organization>Eneco</organization>
-        </developer>
-    </developers>
 
     <properties>
-        <java.version>1.8</java.version>
-        <scala.version>2.11.7</scala.version>
-        <confluent.version>3.0.0</confluent.version>
-        <kafka.version>0.10.0.0</kafka.version>
-        <hosebird.version>2.2.0</hosebird.version>
-        <avro.version>1.7.7</avro.version>
-        <slf4j.version>1.7.13</slf4j.version>
-        <jsr305.version>1.3.9</jsr305.version>
-        <mockito.version>1.10.19</mockito.version>
-        <scalatest.version>3.0.0-M1</scalatest.version>
-        <guava.version>19.0</guava.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
-        <cloudera.maven.repo>https://repository.cloudera.com/artifactory/cloudera-repos</cloudera.maven.repo>
+        <kafka.version>0.10.0.0-cp1</kafka.version>
+        <twitter4j.version>[4.0,)</twitter4j.version>
+        <junit.version>4.12</junit.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>confluent</id>
-            <name>Confluent</name>
-            <url>${confluent.maven.repo}</url>
-        </repository>
-        <repository>
-            <id>cdh.repo</id>
-            <name>Cloudera Repositories</name>
-            <url>${cloudera.maven.repo}</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-api</artifactId>
-            <version>${kafka.version}</version>
-	   <scope>provided</scope>
+            <version>0.10.1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.scalamock</groupId>
-            <artifactId>scalamock-scalatest-support_2.11</artifactId>
-            <version>3.2.2</version>
+            <groupId>io.confluent</groupId>
+            <artifactId>monitoring-interceptors</artifactId>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${jsr305.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.11</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- make sure wrong scala version is not pulled in -->
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>hbc-twitter4j</artifactId>
-            <version>${hosebird.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-            <version>${avro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>io.confluent.kafka</groupId>
+            <artifactId>connect-utils</artifactId>
+            <version>[0.1.0,0.1.100)</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>${twitter4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>${twitter4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.0.106-beta</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/test/resources</directory>
-            </resource>
-        </resources>
 
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>copy-resources</goal>
-                            <goal>testResources</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <inherited>true</inherited>
                 <configuration>
-                    <recompileMode>incremental</recompileMode>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                          <goal>compile</goal>
-                          <goal>add-source</goal>
-                          <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5.3</version>
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
                 </configuration>
                 <executions>
                     <execution>
@@ -226,6 +104,18 @@
                 </executions>
             </plugin>
         </plugins>
-
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>http://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
+
 </project>
