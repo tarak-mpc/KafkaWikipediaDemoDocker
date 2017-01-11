@@ -1,0 +1,5 @@
+#surefire
+#Tue Jan 10 10:22:59 CET 2017
+user.dir=/home/tarak/Desktop/KafkaWikipediaDemoDocker/WikipediaChangesMonitor
+localRepository=/home/tarak/.m2/repository
+basedir=/home/tarak/Desktop/KafkaWikipediaDemoDocker/WikipediaChangesMonitor
