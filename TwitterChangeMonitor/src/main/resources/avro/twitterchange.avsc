@@ -1,0 +1,35 @@
+{
+  "namespace": "io.confluent.examples.kafka.twitter.avro",
+  "type": "record",
+  "name": "TwitterChange",
+  "fields": [
+    {
+      "name": "CreatedAt",
+      "type": [ "long", "null" ]
+    },
+    {
+      "name": "Text",
+      "type": ["string", "null" ]
+    },
+    {
+      "name": "Username",
+      "type": ["string", "null" ]
+    },
+    {
+      "name": "Location",
+      "type": ["string", "null" ]
+    },
+    {
+      "name": "TimeZone",
+      "type": ["string", "null" ]
+    },
+    {
+      "name": "Lang",
+      "type": ["string", "null" ]
+    },
+    {
+      "name": "FollowersCount",
+      "type": ["int", "null" ]
+    }
+  ]
+}

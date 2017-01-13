@@ -1,0 +1,47 @@
+{
+  "namespace": "org.cmatta.kafka.streams.twitter.avro",
+  "type": "record",
+  "name": "twitterChange",
+  "fields": [
+    {
+      "name": "createdat",
+      "type": "long"
+    },
+    {
+      "name": "wikipage",
+      "type": "string"
+    },
+    {
+      "name": "isnew",
+      "type": "boolean"
+    },
+    {
+      "name": "isminor",
+      "type": "boolean"
+    },
+    {
+      "name": "isunpatrolled",
+      "type": "boolean"
+    },
+    {
+      "name": "isbot",
+      "type": "boolean"
+    },
+    {
+      "name": "diffurl",
+      "type": "string"
+    },
+    {
+      "name": "username",
+      "type": "string"
+    },
+    {
+      "name": "bytechange",
+      "type": "int"
+    },
+    {
+      "name": "commitmessage",
+      "type": "string"
+    }
+  ]
+}
