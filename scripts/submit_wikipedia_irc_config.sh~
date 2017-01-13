@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONNECT_HOST=connect
+CONNECT_HOST=localhost
 
 if [[ $1 ]];then
     CONNECT_HOST=$1
