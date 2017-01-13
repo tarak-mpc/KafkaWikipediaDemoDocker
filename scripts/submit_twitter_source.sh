@@ -12,7 +12,7 @@ DATA=$( cat << EOF
   "name": "twitter-connect",
   "config": {
 	"producer.interceptor.classes": "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor",
-	"tasks.max": "1"
+	"tasks.max": "1",
 	"connector.class": "io.confluent.kafka.connect.twitter.TwitterSourceConnector",
 	"twitter.oauth.consumerKey": "2yld5DBiwy4rqjGmj3VFh9KbJ",
 	"twitter.debug": "true",
